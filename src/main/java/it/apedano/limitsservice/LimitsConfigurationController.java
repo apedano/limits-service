@@ -5,6 +5,7 @@
  */
 package it.apedano.limitsservice;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import it.apedano.limitsservice.bean.LimitConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,16 @@ public class LimitsConfigurationController {
         return new LimitConfiguration(
                 configuration.getMaximum(), 
                 configuration.getMinimum());
+    }
+    
+    @GetMapping("/fault-tolerance-example")
+    @HystrixCommand(fallbackMethod = "fallbackREtrieveConfiguration")
+    public LimitConfiguration retrieveConfiguration() {
+        throw new RuntimeException("Not available");
+    }
+    
+    public LimitConfiguration fallbackREtrieveConfiguration() {
+        return new LimitConfiguration(123456, 1234567);
     }
     
 }
